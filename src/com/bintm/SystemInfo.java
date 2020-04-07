@@ -11,7 +11,6 @@ public class SystemInfo {
     SystemInfo(){
 
     }
-
     //RAM data returns in GB
     long getRAMSpace(){ //returns in GB as double
 
@@ -29,8 +28,6 @@ public class SystemInfo {
         return ((os.getFreePhysicalMemorySize()/1024.0)/1024)/1024;
 
     }
-
-
     //Disk data returns in GB
     double getDiskSpace(){
         return ((new File("/").getTotalSpace()/1024.0)/1024.0)/1024.0;
@@ -38,7 +35,11 @@ public class SystemInfo {
     double getAvailableDiskSpace(){
         return (((new File("/").getFreeSpace()/1024.0)/1024.0)/1024.0);
     }
-
+    //returns a percent of total cpu capacity
+    int getCpuUsage(){
+        System.out.println(io.getStdoutArrayFor("wmic cpu get loadpercentage")[1]);
+        return 1;
+    }
 
 
 

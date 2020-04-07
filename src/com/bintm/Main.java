@@ -16,6 +16,9 @@ public class Main {
 
 	    TaskHandler th = new TaskHandler();
 	    th.populate();
+	    th.printChart();
+
+
 
     }
 }
