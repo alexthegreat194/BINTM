@@ -1,16 +1,19 @@
 package com.bintm;
 
+import jdk.jfr.SettingDefinition;
+
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class TaskHandler {
 
     ArrayList<Task> tasks = new ArrayList<Task>(0);
     IOHandler io = new IOHandler();
+    TaskUpdater updater;
+    boolean populating = false;
     static String[] osTaskNames = {
             "svchost.exe",
             ""
-
-
     };
     TaskHandler(){}
 
@@ -24,6 +27,7 @@ public class TaskHandler {
     }
 
     void populate(){
+        populating = true;
         tasks.clear();
         System.out.println("Task Data: ");
         String[] taskdata = io.getStdoutArrayFor("Tasklist /FO csv");
@@ -35,7 +39,9 @@ public class TaskHandler {
 
         }
         System.out.println("Total Tasks Running: "+tasks.size());
+        populating = false;
         updateCpuUsage();
+
     }
 
     void printChart(){
@@ -45,6 +51,25 @@ public class TaskHandler {
                 System.out.println("\t" + t.getPercentOfRam() + "% of ram @" + t.memuse + " Kb");
                 System.out.println("\t" + t.getCpuPercent() + "% of CPU");
         }
+
+    }
+    String[] getTableHeader(){
+        String[] out = {"Name","Ram Usage", "CPU Usage"};
+        return out;
+    }
+
+    String[][] getInfoString(){
+        String[][] out;
+        ArrayList<Task> ts = getImportantTasks();
+        out = new String[ts.size()][3];
+        int i  = 0;
+        for(Task t : ts){
+            out[i][0]= t.name + "\n";
+            out[i][1]= "\t" + t.getPercentOfRam() + "% of ram @" + t.memuse + " Kb" + "\n";
+            out[i][2]="\t" + t.getCpuPercent() + "% of CPU"+"\n";
+            i++;
+        }
+        return out;
 
     }
 
@@ -62,7 +87,7 @@ public class TaskHandler {
     }
 
     ArrayList<Task> getImportantTasks(){
-
+        while(populating){}
         ArrayList<Task> outpt = new ArrayList<Task>();
         for(Task t: tasks){
 
@@ -86,5 +111,49 @@ public class TaskHandler {
         }
     }
 
+    void startUpdateThread(){
+        updater = new TaskUpdater(this);
+        new Thread(updater).start();
+    }
+
+    void stopUpdateThread(){
+        if(updater == null){return;}
+        updater.kill();
+    }
+
+
+}
+
+
+class TaskUpdater implements Runnable{
+
+    TaskHandler t;
+    boolean stop = false;
+    TaskUpdater(TaskHandler t){
+        this.t=t;
+    }
+
+    void sleep(int millis){
+        long time = Instant.now().toEpochMilli();
+        long elapsed = 0;
+        if(stop){return;}
+        while(elapsed<millis) {
+            elapsed = Instant.now().toEpochMilli() - time;
+        }
+    }
+
+    public void run(){
+
+        while(true){
+            sleep(1000);
+            if(stop){return;}
+            t.populate();
+        }
+
+    }
+
+    public void kill(){
+        stop = true;
+    }
 
 }

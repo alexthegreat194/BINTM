@@ -6,7 +6,7 @@ public class Task {
     String name;
     int memuse = 0;
     int cpuUse = 0;
-    int cpuPercent = 0;
+    double cpuPercent = 0;
     SystemInfo sysinf = new SystemInfo();
     TaskHandler parent;
 
@@ -29,8 +29,8 @@ public class Task {
         return outpt;
     }
     void updateCpuUse(){
+        /*
         long before = Instant.now().toEpochMilli();
-
         String[] data = parent.io.getStdoutArrayFor("TASKLIST /V /FO CSV /FI \"IMAGENAME eq "+this.name+".exe \"");
         long after = Instant.now().toEpochMilli();
         int totalTime =(int)(after-before);
@@ -42,12 +42,15 @@ public class Task {
             }
             this.cpuUse+=getSecondsOf(s.replace("\"","").split(",")[8]);
         }
-        cpuPercent = (int)((double)cpuUse/(double)totalTime)/sysinf.getCpuUsage();
+        cpuPercent = ((double)cpuUse/(double)totalTime)/sysinf.getCpuUsage();
+        */
+        String[] data = parent.io.getStdoutArrayFor("typeperf \"\\process("+this.name+")\\% processor time\" -sc 1");
+        this.cpuPercent = Double.valueOf(data[2].split(",")[1].replaceAll("\"",""));
     }
     int getPercentOfRam(){
         return (int)((memuse/(sysinf.getRAMSpace()*1024)));
     }
-    int getCpuPercent(){
+    double getCpuPercent(){
         return cpuPercent;
     }
 

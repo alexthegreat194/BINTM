@@ -1,4 +1,7 @@
 package com.bintm;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.io.*;
 
 
@@ -15,8 +18,19 @@ public class Main {
 	    System.out.println("Free Disk Space: "+sysinf.getAvailableDiskSpace() + " GB");
 
 	    TaskHandler th = new TaskHandler();
-	    th.populate();
-	    th.printChart();
+	    th.startUpdateThread();
+		JFrame frame = new JFrame("FrameDemo");
+
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+		JTable table = new JTable(th.getInfoString(),th.getTableHeader());
+		table.setModel(new DefaultTableModel());
+		frame.getContentPane().add(table, BorderLayout.CENTER);
+
+		frame.pack();
+
+		frame.setVisible(true);
 
 
 
