@@ -9,8 +9,8 @@ public class Main {
 
     public static void main(String[] args) {
 	    System.out.println("Hello World");
-	    IOHandler io = new IOHandler();
-	    SystemInfo sysinf = new SystemInfo();
+	    IOHandler io = new IOHandler(); //
+	    SystemInfo sysinf = new SystemInfo(); //
 	    System.out.println("Total Ram: "+sysinf.getRAMSpace()+" GB");
 	    System.out.println("Ram in use: "+ sysinf.getRAMinUse()+" GB");
 	    System.out.println("Ram Available: "+ sysinf.getAvailableRAM()+" GB");
@@ -31,8 +31,5 @@ public class Main {
 		frame.pack();
 
 		frame.setVisible(true);
-
-
-
     }
 }
