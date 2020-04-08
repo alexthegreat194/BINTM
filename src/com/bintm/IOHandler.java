@@ -5,10 +5,10 @@ import java.io.*;
 public class IOHandler {
     static int id = 0;
     File log;
+    PipedInputStream stream;
     IOHandler(){
         id++;
-        log = new File("temp/temp"+id+".txt");
-        log.deleteOnExit();
+        stream = new PipedInputStream();
     }
     void execute(String command){
         ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", command);
@@ -26,7 +26,7 @@ public class IOHandler {
         String out = "";
         ProcessBuilder pb = new ProcessBuilder("cmd.exe","/c", command);
         pb.redirectErrorStream(true);
-        //pb.redirectOutput(log);
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         Process p;
         try {
 
@@ -39,7 +39,7 @@ public class IOHandler {
                 if(l == null && out.length()>1){break;}
                 out+=l+"\n";
             }
-            System.out.println(out);
+
 
 
         } catch (IOException e) {

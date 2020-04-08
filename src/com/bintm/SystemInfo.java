@@ -7,7 +7,7 @@ import java.lang.management.ManagementFactory;
 
 public class SystemInfo {
     com.sun.management.OperatingSystemMXBean os = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-    //IOHandler io = new IOHandler();
+    IOHandler io = new IOHandler();
     SystemInfo(){
 
     }
@@ -37,8 +37,7 @@ public class SystemInfo {
     }
     //returns a percent of total cpu capacity
     int getCpuUsage(){
-        //System.out.println(io.getStdoutArrayFor("wmic cpu get loadpercentage")[1]);
-        return 1;
+        return Integer.valueOf(io.getStdoutArrayFor("wmic cpu get loadpercentage")[1]);
     }
 
 
