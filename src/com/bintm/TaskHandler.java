@@ -29,7 +29,6 @@ public class TaskHandler {
     void populate(){
         populating = true;
         tasks.clear();
-        System.out.println("Task Data: ");
         String[] taskdata = io.getStdoutArrayFor("Tasklist /FO csv");
         for(int i = 1 ; i < taskdata.length;i++){
             Task t = new Task(taskdata[i],this);
@@ -38,7 +37,6 @@ public class TaskHandler {
             }
 
         }
-        System.out.println("Total Tasks Running: "+tasks.size());
         populating = false;
         updateCpuUsage();
 

@@ -37,7 +37,8 @@ public class SystemInfo {
     }
     //returns a percent of total cpu capacity
     int getCpuUsage(){
-        return Integer.valueOf(io.getStdoutArrayFor("wmic cpu get loadpercentage")[1]);
+
+        return Integer.valueOf(io.getStdoutArrayFor("wmic cpu get loadpercentage")[2].substring(0,2));
     }
 
 
