@@ -27,9 +27,7 @@ public class TaskHandler {
     }
 
     void populate(){
-        populating = true;
-        tasks.clear();
-        System.out.println("Task Data: ");
+
         String[] taskdata = io.getStdoutArrayFor("Tasklist /FO csv");
         for(int i = 1 ; i < taskdata.length;i++){
             Task t = new Task(taskdata[i],this);
@@ -38,8 +36,6 @@ public class TaskHandler {
             }
 
         }
-        System.out.println("Total Tasks Running: "+tasks.size());
-        populating = false;
         updateCpuUsage();
 
     }
@@ -87,8 +83,7 @@ public class TaskHandler {
     }
 
     ArrayList<Task> getImportantTasks(){
-        while(populating){}
-        ArrayList<Task> outpt = new ArrayList<Task>();
+        ArrayList<Task> outpt = new ArrayList<Task>(1);
         for(Task t: tasks){
 
             if(t.getPercentOfRam()>0) {
@@ -101,14 +96,11 @@ public class TaskHandler {
     }
 
     void updateCpuUsage(){
-        for(Task t : getImportantTasks()){
-            try {
-                t.updateCpuUse();
-            }catch (Exception e){
-                System.out.print("Error for task: "+ t.name + " : ");
-                e.printStackTrace();
-            }
-        }
+
+        CPUUpdater cpu = new CPUUpdater(tasks);
+        cpu.run();
+
+        //new Thread(cpu).start();
     }
 
     void startUpdateThread(){
@@ -145,7 +137,7 @@ class TaskUpdater implements Runnable{
     public void run(){
 
         while(true){
-            sleep(1000);
+            sleep(5000);
             if(stop){return;}
             t.populate();
         }
@@ -155,5 +147,22 @@ class TaskUpdater implements Runnable{
     public void kill(){
         stop = true;
     }
+
+}
+
+class CPUUpdater implements Runnable{
+    ArrayList<Task> tasks;
+    CPUUpdater(ArrayList<Task> t){
+        tasks=t;
+    }
+
+    public void run(){
+
+        for(int i = 0 ; i < tasks.size();i++){
+            tasks.get(i).updateCpuUse();
+        }
+
+    }
+
 
 }

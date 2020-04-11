@@ -1,19 +1,24 @@
 package com.bintm;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.time.Instant;
+import java.util.ArrayList;
 
 public class BINTMForm {
     private JPanel panel1;
-    private JLabel CpuLabel;
     private JProgressBar Cpubar;
     private JProgressBar TotalRamBat;
-    private JScrollPane mainScrollPane;
     private JPanel progressArea;
     private JProgressBar freeDiskSpaceBar;
     private JProgressBar totalDiskSpaceBar;
     private JProgressBar ramInUseBar;
     private JProgressBar ramAvailableBar;
+    private JTabbedPane tabbedPane1;
+    private JScrollBar scrollBar1;
+
+    private JTable taskTable;
+    private DefaultTableModel taskModel;
 
     //pablo classes:
     private WindowUpdater updater;
@@ -24,10 +29,19 @@ public class BINTMForm {
     public BINTMForm()
     {
         System.out.println("Window Launch...");
+
+
+
         io = new IOHandler(); //
         sysinf = new SystemInfo(); //
         th = new TaskHandler();
         updater = new WindowUpdater();
+
+        taskModel = new DefaultTableModel();
+        taskModel.addColumn("Name");
+        taskModel.addColumn("RAM");
+        taskModel.addColumn("CPU");
+        taskTable.setModel(taskModel);
 
         System.out.println("Total Ram: "+sysinf.getRAMSpace()+" GB");
         System.out.println("Ram in use: "+ sysinf.getRAMinUse()+" GB");
@@ -66,11 +80,30 @@ public class BINTMForm {
 
     void updateWindowData()
     {
-        TotalRamBat.setValue((int)sysinf.getRAMSpace());
-        freeDiskSpaceBar.setValue((int)sysinf.getDiskSpace());
-        totalDiskSpaceBar.setValue((int)sysinf.getDiskSpace());
-        ramInUseBar.setValue((int)(sysinf.getRAMinUse()/1000));
-        ramAvailableBar.setValue((int)(sysinf.getAvailableRAM()/1000));
+        Cpubar.setValue(sysinf.getCpuUsage());
+        ramAvailableBar.setValue((int)(sysinf.getAvailableRAM() / sysinf.getRAMSpace() * 100));
+        ramInUseBar.setValue((int)(sysinf.getRAMinUse() / sysinf.getRAMSpace() * 100));
+        freeDiskSpaceBar.setValue((int)(sysinf.getAvailableDiskSpace() / sysinf.getDiskSpace() * 100));
+
+        taskModel.setRowCount(0);
+        ArrayList<Task> impTasks = th.getImportantTasks();
+
+       // System.out.println("Update: ");
+
+        for (int i = 0; i < impTasks.size(); i++)
+        {
+            String[] rowData = new String[3];
+            rowData[0] = impTasks.get(i).name;
+            rowData[1] = "" + impTasks.get(i).memuse;
+            rowData[2] = "" + impTasks.get(i).getCpuPercent();
+
+            //System.out.println("\t" + impTasks.get(i).getCpuPercent());
+
+            taskModel.addRow(rowData);
+        }
+
+        taskModel.fireTableDataChanged();
+        taskTable.setModel(taskModel);
     }
 
     public static void main(String[] args) {
